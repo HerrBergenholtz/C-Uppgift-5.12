@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SqlTypes;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 
 class Program
 {
@@ -8,9 +9,9 @@ class Program
     {
         try
         {
-            int[] tärningar = { 0, 0, 0, 0, 0};
+            int[] tärningar = new int[5];
 
-            Console.WriteLine("Tärningarna kastas");
+            Console.WriteLine("Tryck på valfri knapp för att kasta tärningar.");
             Console.ReadKey();
             while (tärningar.Contains(0))
             {
@@ -32,7 +33,7 @@ class Program
             Console.WriteLine("Vill du spela igen? (y/n)");
             string svar = Console.ReadLine();
 
-            if (svar == "y")
+            if (svar.ToLower() == "y")
             {
                 Main();
             }
@@ -50,42 +51,71 @@ class Program
 
     public static void Tärningskast(int[] tärningar)
     {
-        int[] test = new int[5];
-        Random slump = new();
-        Console.WriteLine(" 1  2  3  4  5");
-
-        for (int i = 0; i < test.Length; i++)
+        try
         {
-            test[i] = slump.Next(1, 7);
-        }
-
-        for (int i = 0; i < test.Length; i++)
-        {
-            if (tärningar[i] != 0)
+            int[] test = new int[5];
+            Random slump = new();
+            Console.WriteLine("Nummer:     1  2  3  4  5");
+             
+            for (int i = 0; i < test.Length; i++)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write($"|{tärningar[i]}|");
-                Console.ForegroundColor = ConsoleColor.White;
+                test[i] = slump.Next(1, 7);
             }
-            else
+            Console.Write("Tärningar: ");
+            for (int i = 0; i < test.Length; i++)
             {
-                Console.Write($"|{test[i]}|");
+                if (tärningar[i] != 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write($"|{tärningar[i]}|");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else
+                {
+                    Console.Write($"|{test[i]}|");
+                }
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Skriv nummer på de tärningar du vill låsa in");
+            string[] input = Console.ReadLine().Split(" ");
+
+            int[] inputInt = new int[input.Length];
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                inputInt[i] = int.Parse(input[i]);
+            }
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (tärningar[inputInt[i] - 1] != 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Du har redan låst den tärningen");
+                    Console.ForegroundColor = ConsoleColor.White;
+                }
+                else
+                {
+                    tärningar[inputInt[i] - 1] = test[inputInt[i] - 1];
+                }
             }
         }
-        Console.WriteLine();
 
-        Console.WriteLine("Skriv nummer på de tärningar du vill låsa in");
-        string[] input = Console.ReadLine().Split(" ");
-
-        int[] inputInt = new int[input.Length];
-        for (int i = 0;i < input.Length;i++)
+        catch (IndexOutOfRangeException)
         {
-            inputInt[i] = int.Parse(input[i]);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Du måste skriva in ett tal mellan 1 och 5 som representerar de tärningar som du kastar");
+            Console.ForegroundColor = ConsoleColor.White;
+            Tärningskast(tärningar);
         }
 
-        for (int i = 0; i < input.Length; i++)
+        catch (FormatException)
         {
-            tärningar[inputInt[i] - 1] = test[inputInt[i] - 1];
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Fel input mannen");
+            Console.ForegroundColor = ConsoleColor.White;
+            Tärningskast(tärningar);
         }
     }
 }
